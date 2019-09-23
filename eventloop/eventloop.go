@@ -1,10 +1,11 @@
 package eventloop
 
 import (
+	"time"
+
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/console"
 	"github.com/dop251/goja_nodejs/require"
-	"time"
 )
 
 type job struct {
@@ -112,6 +113,9 @@ func (loop *EventLoop) RunOnLoop(fn func(*goja.Runtime)) {
 
 func (loop *EventLoop) run(inBackground bool) {
 	loop.running = true
+	if loop.jobCount <= 0 {
+		return
+	}
 	for job := range loop.jobChan {
 		job()
 		if !loop.running || !inBackground && loop.jobCount <= 0 {
